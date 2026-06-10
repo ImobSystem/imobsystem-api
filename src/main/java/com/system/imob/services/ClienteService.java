@@ -9,6 +9,8 @@ import com.system.imob.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClienteService {
     @Autowired
@@ -34,5 +36,7 @@ public class ClienteService {
         return new ClienteResponseDTO(cliente.getId(), cliente.getNome(), cliente.getCpf(), cliente.getEmail(), cliente.getTelefone());
     }
 
-
+    public List<ClienteResponseDTO> listarClientes(){
+        return clienteRepository.findAll().stream().map(( cliente) -> new ClienteResponseDTO(cliente.getId(), cliente.getNome(), cliente.getCpf(), cliente.getEmail(), cliente.getTelefone())).toList();
+    }
 }

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
@@ -31,5 +33,9 @@ public class ClienteController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ClienteResponseDTO>> listarClientes(){
+        return ResponseEntity.ok(clienteService.listarClientes());
+    }
 }
 

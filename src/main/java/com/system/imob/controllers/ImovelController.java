@@ -42,6 +42,7 @@ public class ImovelController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletarImovelPorId(@PathVariable Long id){
         imovelService.deletarImovelPorId(id);
     }
