@@ -37,5 +37,9 @@ public class ClienteController {
     public ResponseEntity<List<ClienteResponseDTO>> listarClientes(){
         return ResponseEntity.ok(clienteService.listarClientes());
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @RequestBody ClienteRequestDTO dto){
+        return ResponseEntity.ok(clienteService.atualizarClientePorId(id, dto));
+    }
 }
 
