@@ -54,4 +54,9 @@ public class ClienteService {
         return new ClienteResponseDTO(clienteAtualizado.getId(),
                 clienteAtualizado.getNome(), clienteAtualizado.getCpf(), clienteAtualizado.getEmail(), clienteAtualizado.getTelefone());
     }
+
+    public void deletarClientePorId(Long id) {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        clienteRepository.delete(cliente);
+    }
 }

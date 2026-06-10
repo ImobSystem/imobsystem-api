@@ -41,5 +41,10 @@ public class ClienteController {
     public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @RequestBody ClienteRequestDTO dto){
         return ResponseEntity.ok(clienteService.atualizarClientePorId(id, dto));
     }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarClientePorId(@PathVariable Long id){
+        clienteService.deletarClientePorId(id);
+    }
 }
 
