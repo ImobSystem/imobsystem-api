@@ -75,5 +75,16 @@ public class ImovelService {
                 imovelSalvo.getImobiliaria().getId());
         //TODO: após JWT, substituir dto.imobiliariaId() por imobiliariaId extraído do token
     }
+
+    public ImovelResponseDTO buscarImovelPorId(Long id) {
+    Imovel imovelBuscado = imovelRepository.findById(id).orElseThrow(() -> new RuntimeException("Imóvel não encontrado"));
+    return new ImovelResponseDTO(imovelBuscado.getId(),
+            imovelBuscado.getEndereco(),
+            imovelBuscado.getCEP(),
+            imovelBuscado.getArea_m2(),
+            imovelBuscado.getFinalidade(),
+            imovelBuscado.getStatusImovel(),
+            imovelBuscado.getImobiliaria().getId());
+    }
 }
 

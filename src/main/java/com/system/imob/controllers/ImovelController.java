@@ -35,6 +35,11 @@ public class ImovelController {
         ImovelResponseDTO response = imovelService.atualizarImovel(id, dto);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ImovelResponseDTO> buscarImovelPorId (@PathVariable Long id){
+        ImovelResponseDTO response = imovelService.buscarImovelPorId(id);
+        return ResponseEntity.ok(response);
+    }
 }
 
 
