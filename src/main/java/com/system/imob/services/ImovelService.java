@@ -73,6 +73,7 @@ public class ImovelService {
                 imovelSalvo.getFinalidade(),
                 imovelSalvo.getStatusImovel(),
                 imovelSalvo.getImobiliaria().getId());
+        //TODO: após JWT, substituir dto.imobiliariaId() por imobiliariaId extraído do token
     }
 }
 
