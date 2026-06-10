@@ -2,7 +2,9 @@ package com.system.imob.services;
 
 import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.responses.ClienteResponseDTO;
+import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.models.Cliente;
+import com.system.imob.models.Imovel;
 import com.system.imob.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,4 +33,6 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
         return new ClienteResponseDTO(cliente.getId(), cliente.getNome(), cliente.getCpf(), cliente.getEmail(), cliente.getTelefone());
     }
+
+
 }

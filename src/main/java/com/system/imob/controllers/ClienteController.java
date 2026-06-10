@@ -2,6 +2,7 @@ package com.system.imob.controllers;
 
 import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.responses.ClienteResponseDTO;
+import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.models.Cliente;
 import com.system.imob.repositories.ClienteRepository;
 import com.system.imob.services.ClienteService;
@@ -29,4 +30,6 @@ public class ClienteController {
         ClienteResponseDTO response = clienteService.buscarClientePorId(id);
         return ResponseEntity.ok(response);
     }
+
 }
+
