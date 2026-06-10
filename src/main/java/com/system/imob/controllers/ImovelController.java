@@ -40,6 +40,11 @@ public class ImovelController {
         ImovelResponseDTO response = imovelService.buscarImovelPorId(id);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public void deletarImovelPorId(@PathVariable Long id){
+        imovelService.deletarImovelPorId(id);
+    }
 }
 
 

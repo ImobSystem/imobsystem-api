@@ -86,5 +86,10 @@ public class ImovelService {
             imovelBuscado.getStatusImovel(),
             imovelBuscado.getImobiliaria().getId());
     }
+
+    public void deletarImovelPorId(Long id) {
+        Imovel imovelBuscado = imovelRepository.findById(id).orElseThrow(() -> new RuntimeException("Imóvel não encontrado"));
+        imovelRepository.delete(imovelBuscado);
+    }
 }
 
