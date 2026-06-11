@@ -19,5 +19,7 @@ public class Cliente {
     String email;
     Integer telefone;
     TipoCliente tipoCliente;
-    Imobiliaria imobiliaria; //ajeitar
+    @ManyToOne
+    @JoinColumn(name = "imobiliaria_id")
+    Imobiliaria imobiliaria;
 }
