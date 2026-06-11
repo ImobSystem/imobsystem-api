@@ -13,15 +13,22 @@ import java.time.LocalDate;
 @Setter
 @Entity
 public class Negociacao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Enumerated(EnumType.STRING)
     Finalidade finalidade;
+    @Enumerated(EnumType.STRING)
     StatusNegocio statusNegocio;
+
     LocalDate dataInicio;
     LocalDate dataFim;
+    LocalDate dataUltimaInteracao;
+
     Double valor;
+    String motivoPerda;
 
     @ManyToOne
     @JoinColumn(name = "imovel_id")
@@ -30,4 +37,9 @@ public class Negociacao {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "corretor_id")
+    Corretor corretor;
+
 }

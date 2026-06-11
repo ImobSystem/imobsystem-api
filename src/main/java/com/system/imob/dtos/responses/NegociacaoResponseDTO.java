@@ -12,6 +12,9 @@ public record NegociacaoResponseDTO(
         LocalDate dataInicio,
         LocalDate dataFim,
         Double valor,
+        String motivoPerda,
+        LocalDate dataUltimaInteracao,
         Long imovelId,
-        Long clienteId
+        Long clienteId,
+        Long corretorId
 ) {}
