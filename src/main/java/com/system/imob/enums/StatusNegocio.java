@@ -1,7 +1,10 @@
 package com.system.imob.enums;
 
 public enum StatusNegocio {
-    ABERTA,
-    EM_ANDAMENTO,
-    FECHADA
+    OPORTUNIDADE,
+    EM_ATENDIMENTO,
+    VISITA_AGENDADA,
+    PROPOSTA,
+    GANHO,
+    PERDIDO
 }

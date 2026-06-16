@@ -2,6 +2,7 @@ package com.system.imob.controllers;
 
 import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.responses.ClienteResponseDTO;
+import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.models.Cliente;
 import com.system.imob.repositories.ClienteRepository;
 import com.system.imob.services.ClienteService;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
@@ -29,4 +32,19 @@ public class ClienteController {
         ClienteResponseDTO response = clienteService.buscarClientePorId(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ClienteResponseDTO>> listarClientes(){
+        return ResponseEntity.ok(clienteService.listarClientes());
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @RequestBody ClienteRequestDTO dto){
+        return ResponseEntity.ok(clienteService.atualizarClientePorId(id, dto));
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarClientePorId(@PathVariable Long id){
+        clienteService.deletarClientePorId(id);
+    }
 }
+

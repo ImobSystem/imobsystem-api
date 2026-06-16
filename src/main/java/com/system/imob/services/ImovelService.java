@@ -52,5 +52,44 @@ public class ImovelService {
                         imovel.getStatusImovel(),
                         imovel.getImobiliaria().getId())).toList();
     }
+
+    public ImovelResponseDTO atualizarImovel(Long id, ImovelRequestDTO dto) {
+        Imovel imovel = imovelRepository.findById(id).orElseThrow(() -> new RuntimeException("Imóvel não encontrado"));
+        imovel.setEndereco(dto.endereco());
+        imovel.setCEP(dto.CEP());
+        imovel.setArea_m2(dto.area_m2());
+        imovel.setFinalidade(dto.finalidade());
+        imovel.setStatusImovel(dto.statusImovel());
+        Imobiliaria imobiliaria = imobiliariaRepository.findById(dto.imobiliariaId()).orElseThrow(() -> new RuntimeException("Imobiliaria não encontrada"));
+        imovel.setImobiliaria(imobiliaria);
+
+
+        Imovel imovelSalvo = imovelRepository.save(imovel);
+
+        return new ImovelResponseDTO(imovelSalvo.getId(),
+                imovelSalvo.getEndereco(),
+                imovelSalvo.getCEP(),
+                imovelSalvo.getArea_m2(),
+                imovelSalvo.getFinalidade(),
+                imovelSalvo.getStatusImovel(),
+                imovelSalvo.getImobiliaria().getId());
+        //TODO: após JWT, substituir dto.imobiliariaId() por imobiliariaId extraído do token
+    }
+
+    public ImovelResponseDTO buscarImovelPorId(Long id) {
+    Imovel imovelBuscado = imovelRepository.findById(id).orElseThrow(() -> new RuntimeException("Imóvel não encontrado"));
+    return new ImovelResponseDTO(imovelBuscado.getId(),
+            imovelBuscado.getEndereco(),
+            imovelBuscado.getCEP(),
+            imovelBuscado.getArea_m2(),
+            imovelBuscado.getFinalidade(),
+            imovelBuscado.getStatusImovel(),
+            imovelBuscado.getImobiliaria().getId());
+    }
+
+    public void deletarImovelPorId(Long id) {
+        Imovel imovelBuscado = imovelRepository.findById(id).orElseThrow(() -> new RuntimeException("Imóvel não encontrado"));
+        imovelRepository.delete(imovelBuscado);
+    }
 }
 

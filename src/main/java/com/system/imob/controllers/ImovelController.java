@@ -1,5 +1,6 @@
 package com.system.imob.controllers;
 
+import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.requests.ImovelRequestDTO;
 import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.enums.Finalidade;
@@ -27,6 +28,23 @@ public class ImovelController {
     @GetMapping // ?status=&finalidade=
     public ResponseEntity<List<ImovelResponseDTO>> listar (@RequestParam StatusImovel status, @RequestParam Finalidade finalidade){
         return ResponseEntity.ok(imovelService.listarPorStatusETipo(status,finalidade));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ImovelResponseDTO> atualizarImovel(@PathVariable Long id, @RequestBody ImovelRequestDTO dto){
+        ImovelResponseDTO response = imovelService.atualizarImovel(id, dto);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ImovelResponseDTO> buscarImovelPorId (@PathVariable Long id){
+        ImovelResponseDTO response = imovelService.buscarImovelPorId(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarImovelPorId(@PathVariable Long id){
+        imovelService.deletarImovelPorId(id);
     }
 }
 
