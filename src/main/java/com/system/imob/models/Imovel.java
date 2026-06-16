@@ -17,7 +17,9 @@ public class Imovel {
     String endereco;
     String CEP;
     Double area_m2;
+    @Enumerated(EnumType.STRING)
     Finalidade finalidade;
+    @Enumerated(EnumType.STRING)
     StatusImovel statusImovel;
     @ManyToOne
     @JoinColumn(name = "imobiliaria_id")

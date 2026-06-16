@@ -23,7 +23,7 @@ public class Imobiliaria {
     String nome;
     String cnpj;
     String email;
-    Integer telefone;
+    String telefone;
     @Enumerated(EnumType.STRING)
     StatusPlano statusPlano;
     @Enumerated(EnumType.STRING)

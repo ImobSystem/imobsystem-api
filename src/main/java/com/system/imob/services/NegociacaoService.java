@@ -1,6 +1,7 @@
 package com.system.imob.services;
 
 import com.system.imob.dtos.requests.NegociacaoRequestDTO;
+import com.system.imob.dtos.requests.NegociacaoStatusRequestDTO;
 import com.system.imob.dtos.responses.NegociacaoResponseDTO;
 import com.system.imob.models.Cliente;
 import com.system.imob.models.Corretor;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+
 @Service
 public class NegociacaoService {
     @Autowired
@@ -57,10 +60,39 @@ public class NegociacaoService {
 
         Negociacao salva = negociacaoRepository.save(negociacao);
 
-        return new NegociacaoResponseDTO(salva.getId(), salva.getFinalidade(),
-                salva.getStatusNegocio(), salva.getDataInicio(), salva.getDataFim(),
-                salva.getValor(), salva.getMotivoPerda(), salva.getDataUltimaInteracao(),
-                salva.getImovel().getId(), salva.getCliente().getId(),
-                salva.getCorretor().getId());
+        return toResponseDTO(salva);
+    }
+
+    public List<NegociacaoResponseDTO> listarNegociacoes(){
+        return negociacaoRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public NegociacaoResponseDTO buscarNegociacaoPorId(Long id){
+        Negociacao negociacao = negociacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Negociação não encontrada"));
+        return toResponseDTO(negociacao);
+    }
+
+    public NegociacaoResponseDTO atualizarStatus(Long id, NegociacaoStatusRequestDTO dto){
+        Negociacao negociacao = negociacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Negociação não encontrada"));
+
+        negociacao.setStatusNegocio(dto.statusNegocio());
+        negociacao.setMotivoPerda(dto.motivoPerda());
+        negociacao.setDataUltimaInteracao(LocalDate.now());
+
+        Negociacao atualizada = negociacaoRepository.save(negociacao);
+
+        return toResponseDTO(atualizada);
+    }
+
+    private NegociacaoResponseDTO toResponseDTO(Negociacao negociacao){
+        return new NegociacaoResponseDTO(negociacao.getId(), negociacao.getFinalidade(),
+                negociacao.getStatusNegocio(), negociacao.getDataInicio(), negociacao.getDataFim(),
+                negociacao.getValor(), negociacao.getMotivoPerda(), negociacao.getDataUltimaInteracao(),
+                negociacao.getImovel().getId(), negociacao.getCliente().getId(),
+                negociacao.getCorretor().getId());
     }
 }

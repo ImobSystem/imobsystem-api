@@ -2,7 +2,6 @@ package com.system.imob.models;
 
 import com.system.imob.enums.TipoCliente;
 import jakarta.persistence.*;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +16,8 @@ public class Cliente {
     String nome;
     String cpf;
     String email;
-    Integer telefone;
+    String telefone;
+    @Enumerated(EnumType.STRING)
     TipoCliente tipoCliente;
     @ManyToOne
     @JoinColumn(name = "imobiliaria_id")
