@@ -14,7 +14,7 @@ public class CorretorController {
     @Autowired
     private CorretorService corretorService;
 
-    @PostMapping
+    @PostMapping("/cadastrar")
     public ResponseEntity<CorretorResponseDTO> cadastrarCorretor (@RequestBody CorretorRequestDTO dto){
         CorretorResponseDTO response = corretorService.cadastrarCorretor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
