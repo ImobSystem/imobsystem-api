@@ -1,12 +1,16 @@
 package com.system.imob.services;
 
+import com.system.imob.config.JwtUtil;
 import com.system.imob.dtos.requests.CorretorRequestDTO;
+import com.system.imob.dtos.requests.LoginRequestDTO;
 import com.system.imob.dtos.responses.CorretorResponseDTO;
+import com.system.imob.dtos.responses.LoginResponseDTO;
 import com.system.imob.models.Corretor;
 import com.system.imob.models.Imobiliaria;
 import com.system.imob.repositories.CorretorRepository;
 import com.system.imob.repositories.ImobiliariaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,15 +18,33 @@ import java.util.List;
 @Service
 public class CorretorService {
     @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
     private CorretorRepository corretorRepository;
     @Autowired
     private ImobiliariaRepository imobiliariaRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public LoginResponseDTO login (LoginRequestDTO dto){
+        Corretor corretor = corretorRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("Email ou senha inválidos"));
+
+
+        if (!passwordEncoder.matches(dto.senha(), corretor.getSenha())) {
+            throw new RuntimeException("Email ou senha inválidos");
+        }
+
+        String token = jwtUtil.gerarToken(corretor);
+
+        return new LoginResponseDTO(token, corretor.getEmail(), corretor.getPerfil());
+    }
 
     public CorretorResponseDTO cadastrarCorretor(CorretorRequestDTO dto){
         Corretor corretor = new Corretor();
         corretor.setNome(dto.nome());
         corretor.setEmail(dto.email());
-        corretor.setSenha(dto.senha()); // TODO: encriptar quando o JWT entrar
+        corretor.setSenha(passwordEncoder.encode(dto.senha())); // TODO: encriptar quando o JWT entrar
         corretor.setCreci(dto.creci());
         corretor.setPerfil(dto.perfil());
         Imobiliaria imobiliaria = imobiliariaRepository.findById(dto.imobiliariaId())
@@ -47,11 +69,12 @@ public class CorretorService {
     }
 
     public CorretorResponseDTO atualizarCorretorPorId(Long id, CorretorRequestDTO dto){
+        // TODO: tratar atualização sem alterar senha
         Corretor corretor = corretorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Corretor não encontrado"));
         corretor.setNome(dto.nome());
         corretor.setEmail(dto.email());
-        corretor.setSenha(dto.senha()); // TODO: encriptar quando o JWT entrar
+        corretor.setSenha(passwordEncoder.encode(dto.senha()));
         corretor.setCreci(dto.creci());
         corretor.setPerfil(dto.perfil());
         Imobiliaria imobiliaria = imobiliariaRepository.findById(dto.imobiliariaId())
