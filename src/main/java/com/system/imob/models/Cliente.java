@@ -20,6 +20,9 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     TipoCliente tipoCliente;
     @ManyToOne
+    @JoinColumn(name = "corretor_id")
+    Corretor corretor;
+    @ManyToOne
     @JoinColumn(name = "imobiliaria_id")
     Imobiliaria imobiliaria;
 }
