@@ -13,7 +13,7 @@ public record NegociacaoRequestDTO(
         Double valor,
         Long imovelId,
         Long clienteId,
-        Long corretorId, // adicionado
+        Long corretorId, // ignorado — o corretor vem do token
         String motivoPerda, // opcional
-        Long imobiliariaId  // TODO: após JWT, remover — virá do token
+        Long imobiliariaId  // ignorado — a imobiliária vem do imóvel
 ) {}
