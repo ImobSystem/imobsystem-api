@@ -10,6 +10,9 @@ import lombok.Setter;
 @Setter
 @Entity
 public class Imovel {
+    @ManyToOne
+    @JoinColumn(name = "corretor_id")
+    Corretor corretor;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

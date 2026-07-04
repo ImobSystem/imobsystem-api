@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface ImovelRepository extends JpaRepository<Imovel, Long> {
     List<Imovel> findByStatusImovelAndFinalidade(StatusImovel status, Finalidade finalidade);
+    List<Imovel> findByImobiliariaId(Long imobiliariaId);
+    List<Imovel> findByCorretorId(Long corretorId);
 }
