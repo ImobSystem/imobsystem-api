@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/corretores")
 public class CorretorController {
@@ -18,5 +20,10 @@ public class CorretorController {
     public ResponseEntity<CorretorResponseDTO> cadastrarCorretor (@RequestBody CorretorRequestDTO dto){
         CorretorResponseDTO response = corretorService.cadastrarCorretor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CorretorResponseDTO>> listarCorretores(){
+        return ResponseEntity.ok(corretorService.listarCorretores());
     }
 }
