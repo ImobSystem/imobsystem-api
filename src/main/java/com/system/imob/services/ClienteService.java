@@ -106,6 +106,6 @@ public class ClienteService {
 
     private ClienteResponseDTO toResponseDTO(Cliente cliente) {
         return new ClienteResponseDTO(cliente.getId(), cliente.getNome(),
-                cliente.getCpf(), cliente.getEmail(), cliente.getTelefone());
+                cliente.getCpf(), cliente.getEmail(), cliente.getTelefone(), cliente.getTipoCliente());
     }
 }
