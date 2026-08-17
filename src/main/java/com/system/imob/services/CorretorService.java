@@ -1,5 +1,6 @@
 package com.system.imob.services;
 
+import com.system.imob.config.AuthUtil;
 import com.system.imob.config.JwtUtil;
 import com.system.imob.dtos.requests.CorretorRequestDTO;
 import com.system.imob.dtos.requests.LoginRequestDTO;
@@ -26,6 +27,8 @@ import java.util.List;
 public class CorretorService {
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private AuthUtil authUtil;
     @Autowired
     private CorretorRepository corretorRepository;
     @Autowired
@@ -105,7 +108,8 @@ public class CorretorService {
     }
 
     public List<CorretorResponseDTO> listarCorretores(){
-        return corretorRepository.findAll().stream()
+        Long imobiliariaId = authUtil.getImobiliariaId();
+        return corretorRepository.findByImobiliariaId(imobiliariaId).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
