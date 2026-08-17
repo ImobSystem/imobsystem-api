@@ -26,4 +26,9 @@ public class CorretorController {
     public ResponseEntity<List<CorretorResponseDTO>> listarCorretores(){
         return ResponseEntity.ok(corretorService.listarCorretores());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CorretorResponseDTO> buscarPorId(@PathVariable Long id){
+        return ResponseEntity.ok(corretorService.buscarCorretorPorId(id));
+    }
 }

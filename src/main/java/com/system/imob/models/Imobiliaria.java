@@ -2,6 +2,7 @@ package com.system.imob.models;
 
 import com.system.imob.enums.StatusPlano;
 import com.system.imob.enums.TipoPlano;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,4 +30,6 @@ public class Imobiliaria {
     @Enumerated(EnumType.STRING)
     TipoPlano plano;
     LocalDate dataVencimento;
+    @Column(columnDefinition = "TEXT")
+    private String logoBase64;
 }

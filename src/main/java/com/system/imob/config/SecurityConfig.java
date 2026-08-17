@@ -23,12 +23,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> {}) // ativa o CORS (usa a config da classe CorsConfig)
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // libera o preflight OPTIONS do navegador (CORS)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // rotas públicas
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
                         .requestMatchers(HttpMethod.POST, "/imobiliarias/cadastrar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/corretores/cadastrar").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
