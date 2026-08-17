@@ -1,5 +1,6 @@
 package com.system.imob.controllers;
 
+import com.system.imob.dtos.requests.AtualizarLogoRequestDTO;
 import com.system.imob.dtos.requests.ImobiliariaRequestDTO;
 import com.system.imob.dtos.responses.ImobiliariaResponseDTO;
 import com.system.imob.services.ImobiliariaService;
@@ -29,5 +30,15 @@ public class ImobiliariaController {
     @GetMapping
     public ResponseEntity listarImobiliarias() {
         return ResponseEntity.ok(imobiliariaService.listarImobiliarias());
+    }
+
+    @GetMapping("/minha")
+    public ResponseEntity buscarMinhaImobiliaria() {
+        return ResponseEntity.ok(imobiliariaService.buscarMinhaImobiliaria());
+    }
+
+    @PutMapping("/logo")
+    public ResponseEntity atualizarLogo(@RequestBody AtualizarLogoRequestDTO dto) {
+        return ResponseEntity.ok(imobiliariaService.atualizarLogo(dto));
     }
 }
