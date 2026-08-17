@@ -13,5 +13,6 @@ public record ImobiliariaResponseDTO(
         String telefone,
         StatusPlano statusPlano,
         TipoPlano plano,
-        LocalDate dataVencimento
+        LocalDate dataVencimento,
+        String logoBase64
 ) {}
