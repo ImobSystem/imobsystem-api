@@ -18,7 +18,7 @@ public class Imovel {
     Long id;
     // tipo imovel
     String endereco;
-    String CEP;
+    String CEP; 
     Double area_m2;
     @Enumerated(EnumType.STRING)
     Finalidade finalidade;
