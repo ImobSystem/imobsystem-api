@@ -110,6 +110,8 @@ public class ImovelService {
     private ImovelResponseDTO toResponseDTO(Imovel imovel) {
         return new ImovelResponseDTO(imovel.getId(), imovel.getEndereco(),
                 imovel.getCEP(), imovel.getArea_m2(), imovel.getFinalidade(),
-                imovel.getStatusImovel(), imovel.getImobiliaria().getId());
+                imovel.getStatusImovel(), imovel.getImobiliaria().getId(), imovel.getFotos() != null
+                ? imovel.getFotos().stream().map(f -> f.getUrl()).toList()
+                : List.of());
     }
 }
