@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -27,4 +29,6 @@ public class Imovel {
     @ManyToOne
     @JoinColumn(name = "imobiliaria_id")
     Imobiliaria imobiliaria;
+    @OneToMany(mappedBy = "imovel", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<FotoImovel> fotos;
 }
