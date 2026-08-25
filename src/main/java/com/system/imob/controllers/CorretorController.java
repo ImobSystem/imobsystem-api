@@ -31,4 +31,9 @@ public class CorretorController {
     public ResponseEntity<CorretorResponseDTO> buscarPorId(@PathVariable Long id){
         return ResponseEntity.ok(corretorService.buscarCorretorPorId(id));
     }
+
+    @GetMapping("/captacoes")
+    public ResponseEntity listarCaptacoes() {
+        return ResponseEntity.ok(corretorService.listarCaptacoes());
+    }
 }

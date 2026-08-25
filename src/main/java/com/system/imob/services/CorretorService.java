@@ -5,6 +5,7 @@ import com.system.imob.config.JwtUtil;
 import com.system.imob.dtos.requests.CorretorRequestDTO;
 import com.system.imob.dtos.requests.LoginRequestDTO;
 import com.system.imob.dtos.requests.RegistroRequestDTO;
+import com.system.imob.dtos.responses.CaptacaoResponseDTO;
 import com.system.imob.dtos.responses.CorretorResponseDTO;
 import com.system.imob.dtos.responses.LoginResponseDTO;
 import com.system.imob.dtos.responses.RegistroResponseDTO;
@@ -15,7 +16,9 @@ import com.system.imob.models.Corretor;
 import com.system.imob.models.Imobiliaria;
 import com.system.imob.repositories.CorretorRepository;
 import com.system.imob.repositories.ImobiliariaRepository;
+import com.system.imob.repositories.ImovelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,8 @@ public class CorretorService {
     private ImobiliariaRepository imobiliariaRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ImovelRepository imovelRepository;
 
     public LoginResponseDTO login (LoginRequestDTO dto){
         Corretor corretor = corretorRepository.findByEmail(dto.email())
@@ -50,6 +55,23 @@ public class CorretorService {
         return new LoginResponseDTO(token, corretor.getEmail(), corretor.getPerfil());
     }
 
+    public List<CaptacaoResponseDTO> listarCaptacoes() {
+        Corretor logado = authUtil.getCorretorLogado();
+
+        if (logado.getPerfil() != PerfilUsuario.ADMIN) {
+            throw new AccessDeniedException("Apenas ADMIN pode ver captações");
+        }
+
+        Long imobiliariaId = logado.getImobiliaria().getId();
+        List<Corretor> corretores = corretorRepository.findByImobiliariaId(imobiliariaId);
+
+        return corretores.stream()
+                .map(c -> new CaptacaoResponseDTO(
+                        c.getId(),
+                        c.getNome(),
+                        imovelRepository.countByCorretorId(c.getId())))
+                .toList();
+    }
     @Transactional
     public RegistroResponseDTO registrar(RegistroRequestDTO dto){
         corretorRepository.findByEmail(dto.emailAdmin())
