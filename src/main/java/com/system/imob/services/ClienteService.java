@@ -4,6 +4,7 @@ import com.system.imob.config.AuthUtil;
 import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.responses.ClienteResponseDTO;
 import com.system.imob.enums.PerfilUsuario;
+import com.system.imob.enums.TipoCliente;
 import com.system.imob.models.Cliente;
 import com.system.imob.models.Corretor;
 import com.system.imob.repositories.ClienteRepository;
@@ -37,7 +38,7 @@ public class ClienteService {
         return toResponseDTO(clienteSalvo);
     }
 
-    public List<ClienteResponseDTO> listarClientes() {
+    public List<ClienteResponseDTO> listarClientes(String nome, String email, TipoCliente tipo) {
         Corretor logado = authUtil.getCorretorLogado();
 
         List<Cliente> clientes;
@@ -45,6 +46,22 @@ public class ClienteService {
             clientes = clienteRepository.findByImobiliariaId(logado.getImobiliaria().getId());
         } else {
             clientes = clienteRepository.findByCorretorId(logado.getId());
+        }
+
+        if (nome != null && !nome.isBlank()) {
+            clientes = clientes.stream()
+                    .filter(c -> c.getNome().toLowerCase().contains(nome.toLowerCase()))
+                    .toList();
+        }
+        if (email != null && !email.isBlank()) {
+            clientes = clientes.stream()
+                    .filter(c -> c.getEmail().toLowerCase().contains(email.toLowerCase()))
+                    .toList();
+        }
+        if (tipo != null) {
+            clientes = clientes.stream()
+                    .filter(c -> c.getTipoCliente() == tipo)
+                    .toList();
         }
 
         return clientes.stream().map(this::toResponseDTO).toList();

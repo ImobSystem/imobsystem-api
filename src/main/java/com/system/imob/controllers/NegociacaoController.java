@@ -3,6 +3,8 @@ package com.system.imob.controllers;
 import com.system.imob.dtos.requests.NegociacaoRequestDTO;
 import com.system.imob.dtos.requests.NegociacaoStatusRequestDTO;
 import com.system.imob.dtos.responses.NegociacaoResponseDTO;
+import com.system.imob.enums.Finalidade;
+import com.system.imob.enums.StatusNegocio;
 import com.system.imob.services.NegociacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,10 @@ public class NegociacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NegociacaoResponseDTO>> listarNegociacoes (){
-        return ResponseEntity.ok(negociacaoService.listarNegociacoes());
+    public ResponseEntity listarNegociacoes(
+            @RequestParam(required = false) StatusNegocio status,
+            @RequestParam(required = false) Finalidade finalidade) {
+        return ResponseEntity.ok(negociacaoService.listarNegociacoes(status, finalidade));
     }
 
     @GetMapping("/{id}")

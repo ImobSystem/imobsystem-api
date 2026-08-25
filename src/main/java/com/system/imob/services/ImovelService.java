@@ -40,7 +40,7 @@ public class ImovelService {
         return toResponseDTO(imovelSalvo);
     }
 
-    public List<ImovelResponseDTO> listar() {
+    public List<ImovelResponseDTO> listar(String endereco, StatusImovel status, Finalidade finalidade) {
         Corretor logado = authUtil.getCorretorLogado();
 
         List<Imovel> imoveis;
@@ -48,6 +48,23 @@ public class ImovelService {
             imoveis = imovelRepository.findByImobiliariaId(logado.getImobiliaria().getId());
         } else {
             imoveis = imovelRepository.findByCorretorId(logado.getId());
+        }
+
+
+        if (endereco != null && !endereco.isBlank()) {
+            imoveis = imoveis.stream()
+                    .filter(i -> i.getEndereco().toLowerCase().contains(endereco.toLowerCase()))
+                    .toList();
+        }
+        if (status != null) {
+            imoveis = imoveis.stream()
+                    .filter(i -> i.getStatusImovel() == status)
+                    .toList();
+        }
+        if (finalidade != null) {
+            imoveis = imoveis.stream()
+                    .filter(i -> i.getFinalidade() == finalidade)
+                    .toList();
         }
 
         return imoveis.stream().map(this::toResponseDTO).toList();

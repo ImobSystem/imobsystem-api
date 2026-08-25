@@ -2,6 +2,7 @@ package com.system.imob.controllers;
 
 import com.system.imob.dtos.requests.ClienteRequestDTO;
 import com.system.imob.dtos.responses.ClienteResponseDTO;
+import com.system.imob.enums.TipoCliente;
 import com.system.imob.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,11 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClienteResponseDTO>> listarClientes(){
-        return ResponseEntity.ok(clienteService.listarClientes());
+    public ResponseEntity listarClientes(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) TipoCliente tipo) {
+        return ResponseEntity.ok(clienteService.listarClientes(nome, email, tipo));
     }
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @RequestBody ClienteRequestDTO dto){

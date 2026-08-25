@@ -4,7 +4,9 @@ import com.system.imob.config.AuthUtil;
 import com.system.imob.dtos.requests.NegociacaoRequestDTO;
 import com.system.imob.dtos.requests.NegociacaoStatusRequestDTO;
 import com.system.imob.dtos.responses.NegociacaoResponseDTO;
+import com.system.imob.enums.Finalidade;
 import com.system.imob.enums.PerfilUsuario;
+import com.system.imob.enums.StatusNegocio;
 import com.system.imob.models.Cliente;
 import com.system.imob.models.Corretor;
 import com.system.imob.models.Imovel;
@@ -64,7 +66,7 @@ public class NegociacaoService {
         return toResponseDTO(salva);
     }
 
-    public List<NegociacaoResponseDTO> listarNegociacoes(){
+    public List<NegociacaoResponseDTO> listarNegociacoes(StatusNegocio status, Finalidade finalidade) {
         Corretor logado = authUtil.getCorretorLogado();
 
         List<Negociacao> negociacoes;
@@ -74,9 +76,18 @@ public class NegociacaoService {
             negociacoes = negociacaoRepository.findByCorretorId(logado.getId());
         }
 
-        return negociacoes.stream()
-                .map(this::toResponseDTO)
-                .toList();
+        if (status != null) {
+            negociacoes = negociacoes.stream()
+                    .filter(n -> n.getStatusNegocio() == status)
+                    .toList();
+        }
+        if (finalidade != null) {
+            negociacoes = negociacoes.stream()
+                    .filter(n -> n.getFinalidade() == finalidade)
+                    .toList();
+        }
+
+        return negociacoes.stream().map(this::toResponseDTO).toList();
     }
 
     public NegociacaoResponseDTO buscarNegociacaoPorId(Long id){
