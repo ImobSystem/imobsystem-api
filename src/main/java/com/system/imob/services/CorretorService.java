@@ -25,6 +25,8 @@ import com.system.imob.repositories.CorretorRepository;
 import com.system.imob.repositories.ImobiliariaRepository;
 import com.system.imob.repositories.ImovelRepository;
 import com.system.imob.repositories.NegociacaoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +38,9 @@ import java.util.List;
 
 @Service
 public class CorretorService {
+
+    private static final Logger log = LoggerFactory.getLogger(CorretorService.class);
+
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
@@ -52,6 +57,8 @@ public class CorretorService {
     private ClienteRepository clienteRepository;
     @Autowired
     private NegociacaoRepository negociacaoRepository;
+    @Autowired
+    private AsaasService asaasService;
 
     public LoginResponseDTO login (LoginRequestDTO dto){
         Corretor corretor = corretorRepository.findByEmail(dto.email())
@@ -100,6 +107,16 @@ public class CorretorService {
         imobiliaria.setPlano(TipoPlano.BASICO);
         imobiliaria.setDataVencimento(LocalDate.now().plusDays(30));
         Imobiliaria imobiliariaSalva = imobiliariaRepository.save(imobiliaria);
+
+        // O trial de 30 dias vale independente do Asaas, então uma falha aqui não pode barrar o cadastro.
+        // O cliente no Asaas é criado depois, na primeira chamada de assinarPlano().
+        try {
+            imobiliariaSalva.setAsaasCustomerId(asaasService.criarClienteAsaas(imobiliariaSalva));
+            imobiliariaRepository.save(imobiliariaSalva);
+        } catch (Exception e) {
+            log.error("Erro ao criar cliente no Asaas para a imobiliária {}: {}",
+                    imobiliariaSalva.getId(), e.getMessage());
+        }
 
         Corretor corretor = new Corretor();
         corretor.setNome(dto.nomeAdmin());

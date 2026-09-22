@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
                         .requestMatchers(HttpMethod.POST, "/imobiliarias/cadastrar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/corretores/cadastrar").permitAll()
+                        // o Asaas chama esse webhook sem JWT; a autenticidade vem do header asaas-access-token
+                        .requestMatchers(HttpMethod.POST, "/webhooks/asaas").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/error").permitAll()
                         // todo o resto exige autenticação
