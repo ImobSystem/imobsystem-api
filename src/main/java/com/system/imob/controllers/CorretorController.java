@@ -1,7 +1,10 @@
 package com.system.imob.controllers;
 
 import com.system.imob.dtos.requests.CorretorRequestDTO;
+import com.system.imob.dtos.responses.ClienteResponseDTO;
+import com.system.imob.dtos.responses.CorretorMetricasDTO;
 import com.system.imob.dtos.responses.CorretorResponseDTO;
+import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.services.CorretorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,21 @@ public class CorretorController {
     @GetMapping("/{id}")
     public ResponseEntity<CorretorResponseDTO> buscarPorId(@PathVariable Long id){
         return ResponseEntity.ok(corretorService.buscarCorretorPorId(id));
+    }
+
+    @GetMapping("/{id}/imoveis")
+    public ResponseEntity<List<ImovelResponseDTO>> listarImoveisDoCorretor(@PathVariable Long id){
+        return ResponseEntity.ok(corretorService.listarImoveisDoCorretor(id));
+    }
+
+    @GetMapping("/{id}/clientes")
+    public ResponseEntity<List<ClienteResponseDTO>> listarClientesDoCorretor(@PathVariable Long id){
+        return ResponseEntity.ok(corretorService.listarClientesDoCorretor(id));
+    }
+
+    @GetMapping("/{id}/metricas")
+    public ResponseEntity<CorretorMetricasDTO> buscarMetricasDoCorretor(@PathVariable Long id){
+        return ResponseEntity.ok(corretorService.buscarMetricasDoCorretor(id));
     }
 
     @GetMapping("/captacoes")
