@@ -8,4 +8,5 @@ import java.util.List;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     List<Cliente> findByImobiliariaId(Long imobiliariaId);
     List<Cliente> findByCorretorId(Long corretorId);
+    Long countByCorretorId(Long corretorId);
 }
