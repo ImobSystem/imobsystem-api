@@ -1,12 +1,13 @@
 package com.system.imob.config;
 
 import com.system.imob.enums.StatusPlano;
+import com.system.imob.models.Corretor;
 import com.system.imob.models.Imobiliaria;
-import com.system.imob.repositories.ImobiliariaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -14,37 +15,58 @@ import java.time.LocalDate;
 
 @Component
 public class PlanoInterceptor implements HandlerInterceptor {
-    @Autowired
-    private ImobiliariaRepository imobiliariaRepository;
+
+    // 402 e não 403: o frontend precisa distinguir "plano expirado" (renovar)
+    // de "sem permissão" (AccessDeniedException), que pedem telas diferentes
+    private static final String CORPO_PLANO_EXPIRADO =
+            "{\"error\":\"PLANO_EXPIRADO\",\"message\":\"Seu plano expirou. Renove para continuar usando o sistema.\"}";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // TODO: após JWT, ler imobiliariaId do token em vez do header
-        String header = request.getHeader("X-Imobiliaria-Id");
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
 
-        if (header == null || header.isBlank()) {
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "Header X-Imobiliaria-Id é obrigatório");
-            return false;
+        if (rotaLiberada(request)) {
+            return true;
         }
 
-        Long imobiliariaId = Long.parseLong(header);
-
-        Imobiliaria imobiliaria = imobiliariaRepository.findById(imobiliariaId).orElse(null);
-        if (imobiliaria == null) {
-            response.sendError(HttpStatus.NOT_FOUND.value(), "Imobiliária não encontrada");
-            return false;
+        // O JwtAuthFilter já carregou o Corretor do banco e o colocou como principal,
+        // então não precisa de uma segunda consulta aqui
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof Corretor corretor)) {
+            return true; // anônimo ou principal inesperado — quem barra é o Spring Security
         }
 
-        boolean planoInativo = imobiliaria.getStatusPlano() != StatusPlano.ATIVO;
-        boolean planoVencido = imobiliaria.getDataVencimento() == null
-                || imobiliaria.getDataVencimento().isBefore(LocalDate.now());
+        Imobiliaria imobiliaria = corretor.getImobiliaria();
+        boolean planoValido = imobiliaria != null
+                && imobiliaria.getStatusPlano() == StatusPlano.ATIVO
+                && imobiliaria.getDataVencimento() != null
+                && !imobiliaria.getDataVencimento().isBefore(LocalDate.now());
 
-        if (planoInativo || planoVencido) {
-            response.sendError(HttpStatus.PAYMENT_REQUIRED.value(),
-                    "Acesso bloqueado: o plano da imobiliária está vencido ou inativo");
+        if (!planoValido) {
+            response.setStatus(HttpServletResponse.SC_PAYMENT_REQUIRED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(CORPO_PLANO_EXPIRADO);
             return false;
         }
 
         return true;
+    }
+
+    // Rotas que passam mesmo com o plano vencido
+    private boolean rotaLiberada(HttpServletRequest request) {
+        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
+            return true; // preflight do CORS
+        }
+
+        String path = request.getRequestURI();
+
+        return path.startsWith("/auth/")              // login e registro, senão ninguém entra
+                || path.startsWith("/webhooks/")      // o Asaas precisa avisar sobre pagamentos
+                || path.startsWith("/imobiliarias/plano") // ver e assinar plano tem que funcionar expirado
+                || path.equals("/imobiliarias/minha")
+                || path.startsWith("/swagger")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/api-docs")       // caminho real configurado em springdoc.api-docs.path
+                || path.equals("/error");
     }
 }
