@@ -6,6 +6,7 @@ import com.system.imob.dtos.responses.ImovelResponseDTO;
 import com.system.imob.enums.Finalidade;
 import com.system.imob.enums.PerfilUsuario;
 import com.system.imob.enums.StatusImovel;
+import com.system.imob.enums.TipoImovel;
 import com.system.imob.models.Corretor;
 import com.system.imob.models.Imovel;
 import com.system.imob.repositories.ImovelRepository;
@@ -26,11 +27,7 @@ public class ImovelService {
 
     public ImovelResponseDTO cadastrarImovel(ImovelRequestDTO dto) {
         Imovel imovel = new Imovel();
-        imovel.setEndereco(dto.endereco());
-        imovel.setCEP(dto.CEP());
-        imovel.setArea_m2(dto.area_m2());
-        imovel.setFinalidade(dto.finalidade());
-        imovel.setStatusImovel(dto.statusImovel());
+        aplicarDados(imovel, dto);
 
         Corretor corretor = authUtil.getCorretorLogado();
         imovel.setCorretor(corretor);
@@ -40,7 +37,8 @@ public class ImovelService {
         return toResponseDTO(imovelSalvo);
     }
 
-    public List<ImovelResponseDTO> listar() {
+    public List<ImovelResponseDTO> listar(String endereco, StatusImovel status,
+                                          Finalidade finalidade, TipoImovel tipo) {
         Corretor logado = authUtil.getCorretorLogado();
 
         List<Imovel> imoveis;
@@ -50,7 +48,20 @@ public class ImovelService {
             imoveis = imovelRepository.findByCorretorId(logado.getId());
         }
 
-        return imoveis.stream().map(this::toResponseDTO).toList();
+        // Filtro nulo = não enviado, então passa tudo. Assim os quatro são
+        // opcionais e combináveis sem precisar de um if por parâmetro.
+        String trecho = endereco != null && !endereco.isBlank()
+                ? endereco.trim().toLowerCase()
+                : null;
+
+        return imoveis.stream()
+                .filter(i -> trecho == null
+                        || (i.getEndereco() != null && i.getEndereco().toLowerCase().contains(trecho)))
+                .filter(i -> status == null || i.getStatusImovel() == status)
+                .filter(i -> finalidade == null || i.getFinalidade() == finalidade)
+                .filter(i -> tipo == null || i.getTipoImovel() == tipo)
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     public ImovelResponseDTO atualizarImovel(Long id, ImovelRequestDTO dto) {
@@ -59,14 +70,30 @@ public class ImovelService {
 
         verificarAcesso(imovel);
 
+        aplicarDados(imovel, dto);
+
+        Imovel imovelSalvo = imovelRepository.save(imovel);
+        return toResponseDTO(imovelSalvo);
+    }
+
+    // Copia o DTO para a entidade — usado no cadastro e na atualização
+    private void aplicarDados(Imovel imovel, ImovelRequestDTO dto) {
         imovel.setEndereco(dto.endereco());
         imovel.setCEP(dto.CEP());
         imovel.setArea_m2(dto.area_m2());
         imovel.setFinalidade(dto.finalidade());
         imovel.setStatusImovel(dto.statusImovel());
 
-        Imovel imovelSalvo = imovelRepository.save(imovel);
-        return toResponseDTO(imovelSalvo);
+        imovel.setTipoImovel(dto.tipoImovel());
+        imovel.setValor(dto.valor());
+        imovel.setQuartos(dto.quartos());
+        imovel.setBanheiros(dto.banheiros());
+        imovel.setVagasGaragem(dto.vagasGaragem());
+        imovel.setBairro(dto.bairro());
+        imovel.setCidade(dto.cidade());
+        imovel.setEstado(dto.estado());
+        imovel.setDescricao(dto.descricao());
+        imovel.setPublicarPortais(dto.publicarPortais() != null ? dto.publicarPortais() : false);
     }
 
     public ImovelResponseDTO buscarImovelPorId(Long id) {
@@ -107,11 +134,17 @@ public class ImovelService {
         }
     }
 
-    private ImovelResponseDTO toResponseDTO(Imovel imovel) {
+    // Público porque o CorretorService também devolve imóveis — com 18 campos,
+    // manter duas cópias desse mapeamento é pedir pra uma delas ficar pra trás
+    public ImovelResponseDTO toResponseDTO(Imovel imovel) {
         return new ImovelResponseDTO(imovel.getId(), imovel.getEndereco(),
                 imovel.getCEP(), imovel.getArea_m2(), imovel.getFinalidade(),
                 imovel.getStatusImovel(), imovel.getImobiliaria().getId(), imovel.getFotos() != null
                 ? imovel.getFotos().stream().map(f -> f.getUrl()).toList()
-                : List.of());
+                : List.of(),
+                imovel.getTipoImovel(), imovel.getValor(), imovel.getQuartos(),
+                imovel.getBanheiros(), imovel.getVagasGaragem(), imovel.getBairro(),
+                imovel.getCidade(), imovel.getEstado(), imovel.getDescricao(),
+                imovel.getPublicarPortais());
     }
 }

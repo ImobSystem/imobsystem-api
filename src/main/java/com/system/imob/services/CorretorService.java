@@ -52,6 +52,8 @@ public class CorretorService {
     private ClienteRepository clienteRepository;
     @Autowired
     private NegociacaoRepository negociacaoRepository;
+    @Autowired
+    private ImovelService imovelService;
 
     public LoginResponseDTO login (LoginRequestDTO dto){
         Corretor corretor = corretorRepository.findByEmail(dto.email())
@@ -227,11 +229,7 @@ public class CorretorService {
     }
 
     private ImovelResponseDTO toImovelResponseDTO(Imovel imovel){
-        return new ImovelResponseDTO(imovel.getId(), imovel.getEndereco(),
-                imovel.getCEP(), imovel.getArea_m2(), imovel.getFinalidade(),
-                imovel.getStatusImovel(), imovel.getImobiliaria().getId(), imovel.getFotos() != null
-                ? imovel.getFotos().stream().map(f -> f.getUrl()).toList()
-                : List.of());
+        return imovelService.toResponseDTO(imovel);
     }
 
     private ClienteResponseDTO toClienteResponseDTO(Cliente cliente){
