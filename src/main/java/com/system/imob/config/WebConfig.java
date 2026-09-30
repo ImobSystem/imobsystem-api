@@ -12,8 +12,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //registry.addInterceptor(planoInterceptor)
-              //  .addPathPatterns("/imoveis/**", "/clientes/**", "/negociacoes/**")
-                //.excludePathPatterns("/imobiliarias/**");
+        // As exceções ficam dentro do próprio interceptor (rotaLiberada)
+        registry.addInterceptor(planoInterceptor)
+                .addPathPatterns("/**");
     }
 }

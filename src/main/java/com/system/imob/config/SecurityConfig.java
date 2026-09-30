@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/corretores/cadastrar").permitAll()
                         // os portais (ZAP, VivaReal, OLX) leem o feed sem JWT
                         .requestMatchers(HttpMethod.GET, "/feed/xml/**").permitAll()
+                        // o Asaas chama esse webhook sem JWT; a autenticidade vem do header asaas-access-token
+                        .requestMatchers(HttpMethod.POST, "/webhooks/asaas").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/error").permitAll()
                         // todo o resto exige autenticação

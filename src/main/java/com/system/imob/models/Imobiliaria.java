@@ -32,4 +32,7 @@ public class Imobiliaria {
     LocalDate dataVencimento;
     @Column(columnDefinition = "TEXT")
     private String logoBase64;
+
+    String asaasCustomerId;     // ID do cliente no Asaas (ex: "cus_xxxxxxxxxxxx")
+    String asaasSubscriptionId; // ID da assinatura no Asaas (ex: "sub_xxxxxxxxxxxx")
 }
