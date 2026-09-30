@@ -2,6 +2,7 @@ package com.system.imob.dtos.responses;
 
 import com.system.imob.enums.Finalidade;
 import com.system.imob.enums.StatusImovel;
+import com.system.imob.enums.TipoImovel;
 
 import java.util.List;
 
@@ -13,6 +14,16 @@ public record ImovelResponseDTO(
         Finalidade finalidade,
         StatusImovel statusImovel,
         Long imobiliariaId,
-        List<String>fotos
+        List<String> fotos,
+        TipoImovel tipoImovel,
+        Double valor,
+        Integer quartos,
+        Integer banheiros,
+        Integer vagasGaragem,
+        String bairro,
+        String cidade,
+        String estado,
+        String descricao,
+        Boolean publicarPortais
 ) {
 }

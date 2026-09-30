@@ -58,6 +58,7 @@ public class CorretorService {
     @Autowired
     private NegociacaoRepository negociacaoRepository;
     @Autowired
+    private ImovelService imovelService;
     private AsaasService asaasService;
 
     public LoginResponseDTO login (LoginRequestDTO dto){
@@ -203,9 +204,27 @@ public class CorretorService {
         return corretor;
     }
 
-    public List<CorretorResponseDTO> listarCorretores(){
-        Long imobiliariaId = authUtil.getImobiliariaId();
-        return corretorRepository.findByImobiliariaId(imobiliariaId).stream()
+    public List<CorretorResponseDTO> listarCorretores(String nome, String email, PerfilUsuario perfil){
+        Corretor logado = authUtil.getCorretorLogado();
+
+        if (logado.getPerfil() != PerfilUsuario.ADMIN) {
+            throw new AccessDeniedException("Apenas ADMIN pode listar corretores");
+        }
+
+        List<Corretor> corretores =
+                corretorRepository.findByImobiliariaId(logado.getImobiliaria().getId());
+
+        // Filtro nulo = não enviado, então passa tudo. Assim os três são
+        // opcionais e combináveis sem precisar de um if por parâmetro.
+        String trechoNome = nome != null && !nome.isBlank() ? nome.trim().toLowerCase() : null;
+        String trechoEmail = email != null && !email.isBlank() ? email.trim().toLowerCase() : null;
+
+        return corretores.stream()
+                .filter(c -> trechoNome == null
+                        || (c.getNome() != null && c.getNome().toLowerCase().contains(trechoNome)))
+                .filter(c -> trechoEmail == null
+                        || (c.getEmail() != null && c.getEmail().toLowerCase().contains(trechoEmail)))
+                .filter(c -> perfil == null || c.getPerfil() == perfil)
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -228,9 +247,51 @@ public class CorretorService {
         return toResponseDTO(corretorAtualizado);
     }
 
-    public void deletarCorretorPorId(Long id){
+    public void deletarCorretor(Long id){
+        Corretor logado = authUtil.getCorretorLogado();
+
+        if (logado.getPerfil() != PerfilUsuario.ADMIN) {
+            throw new AccessDeniedException("Apenas ADMIN pode excluir corretores");
+        }
+
         Corretor corretor = corretorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Corretor não encontrado"));
+
+        // Só pode excluir corretor da própria imobiliária
+        if (!corretor.getImobiliaria().getId().equals(logado.getImobiliaria().getId())) {
+            throw new AccessDeniedException("Este corretor não pertence à sua imobiliária");
+        }
+
+        // Não pode excluir a si mesmo
+        if (corretor.getId().equals(logado.getId())) {
+            throw new RuntimeException("Você não pode excluir sua própria conta");
+        }
+
+        // Não pode excluir o último ADMIN — a imobiliária ficaria sem quem gerencia plano e equipe
+        if (corretor.getPerfil() == PerfilUsuario.ADMIN) {
+            long totalAdmins = corretorRepository.findByImobiliariaId(logado.getImobiliaria().getId())
+                    .stream()
+                    .filter(c -> c.getPerfil() == PerfilUsuario.ADMIN)
+                    .count();
+            if (totalAdmins <= 1) {
+                throw new RuntimeException("Não é possível excluir o único administrador da imobiliária");
+            }
+        }
+
+        // Sem isso o delete estouraria numa violação de chave estrangeira,
+        // sem dizer ao usuário o que está no caminho
+        long imoveis = imovelRepository.countByCorretorId(id);
+        long clientes = clienteRepository.countByCorretorId(id);
+        long negociacoes = negociacaoRepository.countByCorretorId(id);
+
+        if (imoveis > 0 || clientes > 0 || negociacoes > 0) {
+            throw new RuntimeException(
+                    "Este corretor possui registros vinculados ("
+                    + imoveis + " imóveis, " + clientes + " clientes, " + negociacoes + " negociações). "
+                    + "Transfira ou exclua esses registros antes de remover o corretor."
+            );
+        }
+
         corretorRepository.delete(corretor);
     }
 
@@ -244,11 +305,7 @@ public class CorretorService {
     }
 
     private ImovelResponseDTO toImovelResponseDTO(Imovel imovel){
-        return new ImovelResponseDTO(imovel.getId(), imovel.getEndereco(),
-                imovel.getCEP(), imovel.getArea_m2(), imovel.getFinalidade(),
-                imovel.getStatusImovel(), imovel.getImobiliaria().getId(), imovel.getFotos() != null
-                ? imovel.getFotos().stream().map(f -> f.getUrl()).toList()
-                : List.of());
+        return imovelService.toResponseDTO(imovel);
     }
 
     private ClienteResponseDTO toClienteResponseDTO(Cliente cliente){

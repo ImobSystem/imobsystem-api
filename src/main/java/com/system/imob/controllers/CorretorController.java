@@ -5,6 +5,7 @@ import com.system.imob.dtos.responses.ClienteResponseDTO;
 import com.system.imob.dtos.responses.CorretorMetricasDTO;
 import com.system.imob.dtos.responses.CorretorResponseDTO;
 import com.system.imob.dtos.responses.ImovelResponseDTO;
+import com.system.imob.enums.PerfilUsuario;
 import com.system.imob.services.CorretorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,19 @@ public class CorretorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // Os três filtros são opcionais e podem ser combinados
     @GetMapping
-    public ResponseEntity<List<CorretorResponseDTO>> listarCorretores(){
-        return ResponseEntity.ok(corretorService.listarCorretores());
+    public ResponseEntity<List<CorretorResponseDTO>> listarCorretores(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) PerfilUsuario perfil){
+        return ResponseEntity.ok(corretorService.listarCorretores(nome, email, perfil));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarCorretor(@PathVariable Long id){
+        corretorService.deletarCorretor(id);
     }
 
     @GetMapping("/{id}")

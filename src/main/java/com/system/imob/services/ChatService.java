@@ -234,7 +234,10 @@ public class ChatService {
                     numero(dados, "area_m2"),
                     valorDeEnum(Finalidade.class, dados, "finalidade"),
                     valorDeEnum(StatusImovel.class, dados, "statusImovel"),
-                    null // a imobiliária vem do corretor logado, dentro do ImovelService
+                    // o prompt da IA só coleta os cinco campos básicos; tipo, valor,
+                    // quartos, localização e publicação ficam pra edição do imóvel
+                    null, null, null, null, null,
+                    null, null, null, null, null
             );
             ImovelResponseDTO criado = imovelService.cadastrarImovel(dto);
             return new ChatResponseDTO(
